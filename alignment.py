@@ -1,9 +1,14 @@
-#This software is a free software. Thus, it is licensed under GNU General Public License.
-#Python implementation to Smith-Waterman Algorithm for Homework 1 of Bioinformatics class.
-#Forrest Bao, Sept. 26 <http://fsbao.net> <forrest.bao aT gmail.com>
+"""
+This software is a free software. Thus, it is licensed under GNU General Public License.
+Python implementation to Smith-Waterman Algorithm for Homework 1 of Bioinformatics class.
+Forrest Bao, Sept. 26 <http://fsbao.net> <forrest.bao aT gmail.com>
+"""
 
-# zeros() was origianlly from NumPy.
+# zeros() was originally from NumPy.
 # This version is implemented by alevchuk 2011-04-10
+# It was modified to operate on word level by Omarito 2019-01-10
+
+
 def zeros(shape):
     retval = []
     for x in range(shape[0]):
@@ -12,9 +17,11 @@ def zeros(shape):
             retval[-1].append(0)
     return retval
 
-match_award      = 10
+
+match_award = 10
 mismatch_penalty = -5
-gap_penalty      = -5 # both for opening and extanding
+gap_penalty = -5  # both for opening and extending
+
 
 def match_score(alpha, beta):
     if alpha == beta:
@@ -24,15 +31,15 @@ def match_score(alpha, beta):
     else:
         return mismatch_penalty
 
+
 def finalize(align1, align2):
-    align1 = align1[::-1]    #reverse sequence 1
-    align2 = align2[::-1]    #reverse sequence 2
+    align1 = align1[::-1]    # reverse sequence 1
+    align2 = align2[::-1]    # reverse sequence 2
     
-    i,j = 0,0
+    i, j = 0, 0
     
-    #calcuate identity, score and aligned sequeces
+    # calculate identity, score and aligned sequeces
     symbol = ''
-    found = 0
     score = 0
     identity = 0
     for i in range(0,len(align1)):
@@ -48,18 +55,17 @@ def finalize(align1, align2):
             symbol += ' '
             found = 0
     
-        #if one of them is a gap, output a space
+        # if one of them is a gap, output a space
         elif align1[i] == '-' or align2[i] == '-':          
             symbol += ' '
             score += gap_penalty
     
     identity = float(identity) / len(align1) * 100
     
-    print 'Identity =', "%3.3f" % identity, 'percent'
-    print 'Score =', score
-    print align1
-    print symbol
-    print align2
+    print('Identity =', "%3.3f" % identity, 'percent')
+    print('Score =', score)
+    print(align1)
+    print(align2)
 
 
 def needle(seq1, seq2):
@@ -82,8 +88,8 @@ def needle(seq1, seq2):
 
     # Traceback and compute the alignment 
     align1, align2 = '', ''
-    i,j = m,n # start from the bottom right cell
-    while i > 0 and j > 0: # end toching the top or the left edge
+    i, j = m, n  # start from the bottom right cell
+    while i > 0 and j > 0:  # end touching the top or the left edge
         score_current = score[i][j]
         score_diagonal = score[i-1][j-1]
         score_up = score[i][j-1]
@@ -115,6 +121,7 @@ def needle(seq1, seq2):
 
     finalize(align1, align2)
 
+
 def water(seq1, seq2):
     m, n = len(seq1), len(seq2)  # length of two sequences
     
@@ -141,13 +148,13 @@ def water(seq1, seq2):
             if score[i][j] >= max_score:
                 max_i = i
                 max_j = j
-                max_score = score[i][j];
+                max_score = score[i][j]
     
     align1, align2 = '', ''    # initial sequences
     
-    i,j = max_i,max_j    # indices of path starting point
+    i, j = max_i, max_j    # indices of path starting point
     
-    #traceback, follow pointers
+    # traceback, follow pointers
     while pointer[i][j] != 0:
         if pointer[i][j] == 3:
             align1 += seq1[i-1]
