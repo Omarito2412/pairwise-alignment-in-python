@@ -36,13 +36,11 @@ def finalize(align1, align2):
     align1 = align1[::-1]    # reverse sequence 1
     align2 = align2[::-1]    # reverse sequence 2
     
-    i, j = 0, 0
-    
-    # calculate identity, score and aligned sequeces
+    # calculate identity, score and aligned sequences
     symbol = ''
     score = 0
     identity = 0
-    for i in range(0,len(align1)):
+    for i in range(0, len(align1)):
         # if two AAs are the same, then output the letter
         if align1[i] == align2[i]:                
             symbol = symbol + align1[i]
@@ -53,7 +51,6 @@ def finalize(align1, align2):
         elif align1[i] != align2[i] and align1[i] != '-' and align2[i] != '-': 
             score += match_score(align1[i], align2[i])
             symbol += ' '
-            found = 0
     
         # if one of them is a gap, output a space
         elif align1[i] == '-' or align2[i] == '-':          
@@ -66,6 +63,7 @@ def finalize(align1, align2):
     print('Score =', score)
     print(align1)
     print(align2)
+    return align1, align2
 
 
 def needle(seq1, seq2):
@@ -87,7 +85,7 @@ def needle(seq1, seq2):
             score[i][j] = max(match, delete, insert)
 
     # Traceback and compute the alignment 
-    align1, align2 = '', ''
+    align1, align2 = [], []
     i, j = m, n  # start from the bottom right cell
     while i > 0 and j > 0:  # end touching the top or the left edge
         score_current = score[i][j]
@@ -96,30 +94,30 @@ def needle(seq1, seq2):
         score_left = score[i-1][j]
 
         if score_current == score_diagonal + match_score(seq1[i-1], seq2[j-1]):
-            align1 += seq1[i-1]
-            align2 += seq2[j-1]
+            align1 += [seq1[i-1]]
+            align2 += [seq2[j-1]]
             i -= 1
             j -= 1
         elif score_current == score_left + gap_penalty:
-            align1 += seq1[i-1]
-            align2 += '-'
+            align1 += [seq1[i-1]]
+            align2 += ['-']
             i -= 1
         elif score_current == score_up + gap_penalty:
-            align1 += '-'
-            align2 += seq2[j-1]
+            align1 += ['-']
+            align2 += [seq2[j-1]]
             j -= 1
 
     # Finish tracing up to the top left cell
     while i > 0:
-        align1 += seq1[i-1]
-        align2 += '-'
+        align1 += [seq1[i-1]]
+        align2 += ['-']
         i -= 1
     while j > 0:
-        align1 += '-'
-        align2 += seq2[j-1]
+        align1 += ['-']
+        align2 += [seq2[j-1]]
         j -= 1
 
-    finalize(align1, align2)
+    return finalize(align1, align2)
 
 
 def water(seq1, seq2):
@@ -136,38 +134,38 @@ def water(seq1, seq2):
             score_diagonal = score[i-1][j-1] + match_score(seq1[i-1], seq2[j-1])
             score_up = score[i][j-1] + gap_penalty
             score_left = score[i-1][j] + gap_penalty
-            score[i][j] = max(0,score_left, score_up, score_diagonal)
+            score[i][j] = max(0, score_left, score_up, score_diagonal)
             if score[i][j] == 0:
-                pointer[i][j] = 0 # 0 means end of the path
+                pointer[i][j] = 0  # 0 means end of the path
             if score[i][j] == score_left:
-                pointer[i][j] = 1 # 1 means trace up
+                pointer[i][j] = 1  # 1 means trace up
             if score[i][j] == score_up:
-                pointer[i][j] = 2 # 2 means trace left
+                pointer[i][j] = 2  # 2 means trace left
             if score[i][j] == score_diagonal:
-                pointer[i][j] = 3 # 3 means trace diagonal
+                pointer[i][j] = 3  # 3 means trace diagonal
             if score[i][j] >= max_score:
                 max_i = i
                 max_j = j
                 max_score = score[i][j]
     
-    align1, align2 = '', ''    # initial sequences
+    align1, align2 = [], []    # initial sequences
     
     i, j = max_i, max_j    # indices of path starting point
     
     # traceback, follow pointers
     while pointer[i][j] != 0:
         if pointer[i][j] == 3:
-            align1 += seq1[i-1]
-            align2 += seq2[j-1]
+            align1 += [seq1[i-1]]
+            align2 += [seq2[j-1]]
             i -= 1
             j -= 1
         elif pointer[i][j] == 2:
-            align1 += '-'
-            align2 += seq2[j-1]
+            align1 += ['-']
+            align2 += [seq2[j-1]]
             j -= 1
         elif pointer[i][j] == 1:
-            align1 += seq1[i-1]
-            align2 += '-'
+            align1 += [seq1[i-1]]
+            align2 += ['-']
             i -= 1
 
-    finalize(align1, align2)
+    return finalize(align1, align2)
